@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProductMapper">
+
+    <!--表名 -->
+    <sql id="tableName">
+		DB_PRODUCT
+	</sql>
+
+    <!-- 字段 -->
+    <sql id="Field">
+		PRODUCT_ID,	
+		PRODUCT_NAME,	
+		PRODUCT_URL,	
+		PRODUCT_IMG,	
+		PRODUCT_TYPE,	
+		CLICK_NUMBER,	
+		CREATE_TIME,
+		PACKAGE_ID,
+		DATE_RATE,
+		SUCC_RATE,
+		STATUS
+	</sql>
+
+    <!-- 字段值 -->
+    <sql id="FieldValue">
+		#{PRODUCT_ID},	
+		#{PRODUCT_NAME},	
+		#{PRODUCT_URL},	
+		#{PRODUCT_IMG},	
+		#{PRODUCT_TYPE},
+		#{CLICK_NUMBER},
+		#{CREATE_TIME},
+		#{PACKAGE_ID},
+		#{DATE_RATE},
+		#{SUCC_RATE},
+		#{STATUS}
+	</sql>
+
+    <!-- 新增-->
+    <insert id="save" parameterType="pd">
+        insert into
+        <include refid="tableName"></include>
+        (
+        PRODUCT_ID,
+        PRODUCT_NAME,
+        PRODUCT_URL,
+        PRODUCT_IMG,
+        PRODUCT_TYPE,
+        CREATE_TIME,
+        PACKAGE_ID,
+        DATE_RATE,
+        SUCC_RATE,
+        STATUS
+        ) values (
+        #{PRODUCT_ID},
+        #{PRODUCT_NAME},
+        #{PRODUCT_URL},
+        #{PRODUCT_IMG},
+        #{PRODUCT_TYPE},
+        #{CREATE_TIME},
+        #{PACKAGE_ID},
+        #{DATE_RATE},
+        #{SUCC_RATE},
+        #{STATUS}
+        )
+    </insert>
+
+    <!-- 删除-->
+    <delete id="delete" parameterType="pd">
+        delete from
+        <include refid="tableName"></include>
+        where
+        PRODUCT_ID = #{PRODUCT_ID}
+    </delete>
+
+    <!-- 修改 -->
+    <update id="edit" parameterType="pd">
+        update
+        <include refid="tableName"></include>
+        set
+        PRODUCT_NAME = #{PRODUCT_NAME},
+        PRODUCT_URL = #{PRODUCT_URL},
+        PRODUCT_IMG = #{PRODUCT_IMG},
+        PRODUCT_TYPE = #{PRODUCT_TYPE},
+        CLICK_NUMBER = CLICK_NUMBER+1,
+        PACKAGE_ID = #{PACKAGE_ID},
+        DATE_RATE = #{DATE_RATE},
+        SUCC_RATE = #{SUCC_RATE},
+        STATUS = #{STATUS}
+        where
+        PRODUCT_ID = #{PRODUCT_ID}
+    </update>
+
+    <!-- 通过ID获取数据 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where
+        PRODUCT_ID = #{PRODUCT_ID}
+    </select>
+
+    <!-- 列表 -->
+    <select id="datalistPage" parameterType="page" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where 1=1
+        <if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+            and
+            (
+            PRODUCT_ID LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            or
+            PRODUCT_NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            or
+            PRODUCT_URL LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            or
+            PRODUCT_TYPE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            or
+            STATUS LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            or
+            PACKAGE_ID LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+            )
+        </if>
+        <if test="pd.PACKAGE_ID!= null and pd.PACKAGE_ID != ''"><!-- 关键词检索 -->
+            and
+            (
+            PACKAGE_ID LIKE CONCAT(CONCAT('%', #{pd.PACKAGE_ID}),'%')
+            )
+        </if>
+    </select>
+
+
+    <!-- 通过类包查询列表 -->
+    <select id="packListPage" parameterType="page" resultType="pd">
+        select
+        <include refid="Field"></include>
+        from
+        <include refid="tableName"></include>
+        where 1=1
+        <if test="pd.PACKAGE_ID!= null and pd.PACKAGE_ID != ''"><!-- 关键词检索 -->
+        and
+        (
+        PACKAGE_ID LIKE CONCAT(CONCAT('%', #{pd.PACKAGE_ID}),'%')
+        )
+    </if>
+        order by STATUS DESC
+    </select>
+
+    <!-- 列表(全部) -->
+    <select id="listAll" parameterType="pd" resultType="pd">
+        select *
+        from db_product
+        order by package_id desc;
+    </select>
+
+    <!-- 批量删除 -->
+    <delete id="deleteAll" parameterType="String">
+        delete from
+        <include refid="tableName"></include>
+        where
+        PRODUCT_ID in
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- shine845196784qq(千帆i) -->
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ShopMapper">
+
+	<resultMap type="Shop" id="shopResultMap">
+		<id column="SHOP_ID" property="SHOP_ID"/>
+		<result column="SHOP_NAME" property="SHOP_NAME"/>
+		<result column="SHOP_URL" property="SHOP_URL"/>
+		<result column="PARENT_ID" property="PARENT_ID"/>
+		<result column="SHOP_ORDER" property="SHOP_ORDER"/>
+		<result column="SHOP_ICON" property="SHOP_ICON"/>
+		<result column="SHOP_TYPE" property="SHOP_TYPE"/>
+	</resultMap>
+
+	<!-- ztree -->
+	<resultMap type="Shop" id="shopZtreeResultMap">
+		<id column="SHOP_ID" property="SHOP_ID"/>
+		<result column="SHOP_NAME" property="SHOP_NAME"/>
+		<result column="SHOP_URL" property="SHOP_URL"/>
+		<result column="PARENT_ID" property="PARENT_ID"/>
+		<result column="SHOP_ORDER" property="SHOP_ORDER"/>
+		<result column="SHOP_ICON" property="SHOP_ICON"/>
+		<result column="SHOP_TYPE" property="SHOP_TYPE"/>
+		<result column="target" property="target"></result>
+	</resultMap>
+	
+	<!--表名 -->
+	<sql id="tableName">
+		DB_SHOP
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field">
+		SHOP_ID,
+ 		SHOP_NAME,
+ 		SHOP_URL,
+ 		PARENT_ID,
+ 		SHOP_ICON,
+ 		SHOP_ORDER,
+ 		SHOP_STATE,
+ 		SHOP_TYPE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{SHOP_ID},
+ 		#{SHOP_NAME},
+ 		#{SHOP_URL},
+ 		#{PARENT_ID},
+ 		#{SHOP_ICON},
+ 		#{SHOP_ORDER},
+ 		#{SHOP_STATE},
+ 		#{SHOP_TYPE}
+	</sql>
+
+	<!--通过ID获取其子一级菜单 -->
+	<select id="listSubShopByParentId" parameterType="String" resultMap="shopResultMap">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where PARENT_ID = #{parentId} order by (SHOP_ORDER+0)
+	</select>
+
+
+	<!--通过菜单ID获取数据 -->
+	<select id="getShopById" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where SHOP_ID=#{SHOP_ID}
+	</select>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+
+	<!--取最大ID-->
+	<select id="findMaxId" parameterType="pd" resultType="pd">
+		select MAX(SHOP_ID) MID from
+		<include refid="tableName"></include>
+	</select>
+
+	<!--删除菜单-->
+	<delete id="deleteShopById" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where SHOP_ID=#{SHOP_ID}
+	</delete>
+
+	<!--编辑 -->
+	<update id="updateShop" parameterType="Shop">
+		update
+		<include refid="tableName"></include>
+		set
+		SHOP_NAME =#{SHOP_NAME},
+		SHOP_URL  =#{SHOP_URL} ,
+		SHOP_ORDER=#{SHOP_ORDER},
+		SHOP_STATE=#{SHOP_STATE},
+		SHOP_TYPE =#{SHOP_TYPE}
+		where
+		SHOP_ID=#{SHOP_ID}
+	</update>
+
+	<!--保存菜单图标  -->
+	<update id="editicon" parameterType="Shop">
+		update
+		<include refid="tableName"></include>
+		set
+		SHOP_ICON=#{SHOP_ICON}
+		where
+		SHOP_ID=#{SHOP_ID}
+	</update>
+	
+	<!-- shine845196784qq(千帆i) -->
+</mapper>
